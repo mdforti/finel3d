@@ -1,0 +1,4 @@
+###### Requirements without Version Specifiers ######`
+numpy
+alive_progress
+console-menu
