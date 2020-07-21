@@ -269,7 +269,7 @@ elif solve == 'Normal-Modes':
     mat_rig = f_elem.get_stiff_mat(ElementType=ELEM_type)
     K_glob = f_elem.get_global_mat(ElementType=ELEM_type, matrix_to_assemble=mat_rig)
     #matriz de masa reducida
-    np.savetxt('rigidez_global.txt',K_glob,fmt='%.2f')
+    #np.savetxt('rigidez_global.txt',K_glob,fmt='%.2f')
     #pdb.set_trace()
 
     if ELEM_type == 5:
@@ -289,26 +289,9 @@ elif solve == 'Normal-Modes':
     disp = np.zeros(DOF_nodes*len(nodes))
 
     for i in range(len(r)):
-        disp[r[i]] = autov[0, i]
-    #pdb.set_trace()
+        disp[r[i]] = autov[i, 4]
+    pdb.set_trace()
     
     file.clean()
     if ELEM_type == 4:
-        #Cuenta los elementos nuevamente para que las tensiones se escriban correctamente
-        countElements = file.find_elements(ElementType=4)
         file.simple_write(disp,'Desplazam. MAX', dof_per_node=DOF_nodes)
-    #zeros = np.zeros([2, 2*len(f_elem.elements)])
-    #autovec = np.append(zeros, autov, axis=0)
-    # Calculo de frecuencuas
-    #freq = np.sqrt(autovec) / (2*np.pi)
-
-    # Graficos
-    #x = np.linspace(0, 1, len(f_elem.elements) + 1)
-    # Muestra los primeros 3 modos normales
-    #index = 0, 1, 2
-    #y = autovec[0::2, index] / autovec[-2, index]
-    # Grafica
-    #plt.plot(x, y)
-    #plt.grid()
-    #plt.show()
-    #exit()

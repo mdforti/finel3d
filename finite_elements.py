@@ -432,12 +432,8 @@ class finite_elements:
 
                 for elem in range(len(self.elements)):
                    
-                    mass_mat = mass_mat * self.volume_array[elem] * density / 20
-                    
-                    matrix.append(mass_mat)
+                    matrix.append(mass_mat * self.volume_array[elem] * density / 20)
             
-
-
             else:
                 print("can't obtain mass matrix. Change to 'consistent'")
                 exit()
