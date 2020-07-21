@@ -1,0 +1,21 @@
+$MeshFormat
+2.2 0 8
+$EndMeshFormat
+$PhysicalNames
+3
+2 2 "surf1"
+2 3 "surf2"
+3 10 "vol1"
+$EndPhysicalNames
+$Nodes
+4
+1 1 1 2
+2 0 0 0
+3 0 2 0
+4 2 1 0
+$EndNodes
+$Elements
+2
+1 2 2 2 1 1 9 2
+2 4 2 10 1 1 2 3 4
+$EndElements

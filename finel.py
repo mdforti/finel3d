@@ -237,6 +237,7 @@ elif solve == 'Normal-Modes':
     #file.BST_config()
     #print('Opening Boundaries Selection Tool...')
     #subprocess.call('./bst')
+    
     print('Opening pyBST...')
     print("Please generate boundary condition file!")
     print()
@@ -255,7 +256,7 @@ elif solve == 'Normal-Modes':
             break
     print('Reading boundaries file')
     boundaries = boundaries.read('nodes_selection_file.dat')
-
+    
     f_elem = fe.finite_elements(nodes=nodes_mat, elements=elem, dof_per_node=DOF_nodes)
     
     if ELEM_type == 5:

@@ -163,7 +163,7 @@ class finite_elements:
             D[3,3], D[4,4], D[5,5] = ((1 - 2*nu)/2) * np.array([1, 1, 1])
             D[0, 1], D[0,2], D[1, 2] = nu, nu, nu
             D[1, 0], D[2,0], D[2, 1] = nu, nu, nu
-            self.D = ( E/((1+nu)*(1-nu) ) )* D
+            self.D = D * ( E/((1+nu)*(1-(2*nu))) )
             stiff_matrix = []
             volume = []
             x, y, z = self.nodes[:,0], self.nodes[:,1], self.nodes[:,2]
@@ -281,8 +281,8 @@ class finite_elements:
                               [0, gamma_4, 0],
                               [0, 0, delta_4],
                               [gamma_4, beta_4, 0],
-                              [0, delta_1, gamma_4],
-                              [delta_1, 0, beta_4]])
+                              [0, delta_4, gamma_4],
+                              [delta_4, 0, beta_4]])
 
                 B = np.concatenate((B1, B2, B3, B4), axis=1)
                 B = B / volume_6
@@ -295,6 +295,7 @@ class finite_elements:
                 volume.append(volume_6/6)
             self.stiff_mat = np.array(stiff_matrix)
             self.volume_array = np.array(volume)
+            #pdb.set_trace()
 
         return self.stiff_mat
     
