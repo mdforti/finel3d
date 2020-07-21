@@ -431,7 +431,9 @@ class finite_elements:
                                      [0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 2]])
 
                 for elem in range(len(self.elements)):
+                   
                     mass_mat = mass_mat * self.volume_array[elem] * density / 20
+                    
                     matrix.append(mass_mat)
             
 

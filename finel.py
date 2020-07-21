@@ -269,7 +269,7 @@ elif solve == 'Normal-Modes':
     mat_rig = f_elem.get_stiff_mat(ElementType=ELEM_type)
     K_glob = f_elem.get_global_mat(ElementType=ELEM_type, matrix_to_assemble=mat_rig)
     #matriz de masa reducida
-    #np.savetxt('rigidez_global.txt',K_glob,fmt='%.2f')
+    np.savetxt('rigidez_global.txt',K_glob,fmt='%.2f')
     #pdb.set_trace()
 
     if ELEM_type == 5:
@@ -277,7 +277,7 @@ elif solve == 'Normal-Modes':
         m_glob = f_elem.get_global_mat(ElementType=ELEM_type, matrix_to_assemble=red_mass)
 
     if ELEM_type == 4:
-        mass_mat = f_elem.mass_matrix(ElementType=ELEM_type, matrix_type='consistent', density=1)
+        mass_mat = f_elem.mass_matrix(ElementType=ELEM_type, matrix_type='consistent', density=7850)
         m_glob = f_elem.get_global_mat(ElementType=ELEM_type, matrix_to_assemble=mass_mat)
     #condiciones de contorno del problema
     nodes = boundaries.get_boundaries()
