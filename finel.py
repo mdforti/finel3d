@@ -277,11 +277,12 @@ elif solve == 'Normal-Modes':
         m_glob = f_elem.get_global_mat(ElementType=ELEM_type, matrix_to_assemble=red_mass)
 
     if ELEM_type == 4:
-        mass_mat = f_elem.mass_matrix(ElementType=ELEM_type, matrix_type='consistent', density=1)
+        mass_mat = f_elem.mass_matrix(ElementType=ELEM_type, matrix_type='consistent', density=7850)
         m_glob = f_elem.get_global_mat(ElementType=ELEM_type, matrix_to_assemble=mass_mat)
     #condiciones de contorno del problema
     nodes = boundaries.get_boundaries()
     r, s = boundaries.get_r_s(nodes, dof_per_node=DOF_nodes)
+    pdb.set_trace()
     
     #calculo de autovalores
     autoval, autov = eigh(K_glob[np.ix_(r,r)], m_glob[np.ix_(r,r)])
