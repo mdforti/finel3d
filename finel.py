@@ -226,7 +226,7 @@ elif solve == 'Normal-Modes':
     # ElementType == 5 ! ojo que para gmsh son elementos tipo 1
     file = gmesh.read(file_name)
     nodes_mat = file.read_nodes()
-    
+
     if ELEM_type == 5:
         print('Using element 1 as Beam')
         elem = file.find_elements(ElementType=1)
@@ -256,7 +256,7 @@ elif solve == 'Normal-Modes':
             break
     print('Reading boundaries file')
     boundaries = boundaries.read('nodes_selection_file.dat')
-    
+
     f_elem = fe.finite_elements(nodes=nodes_mat, elements=elem, dof_per_node=DOF_nodes)
     
     if ELEM_type == 5:
@@ -270,28 +270,33 @@ elif solve == 'Normal-Modes':
     K_glob = f_elem.get_global_mat(ElementType=ELEM_type, matrix_to_assemble=mat_rig)
     #matriz de masa reducida
     #np.savetxt('rigidez_global.txt',K_glob,fmt='%.2f')
-    #pdb.set_trace()
-
     if ELEM_type == 5:
         red_mass = f_elem.mass_matrix(ElementType=ELEM_type, matrix_type='consistent', density=7850)
         m_glob = f_elem.get_global_mat(ElementType=ELEM_type, matrix_to_assemble=red_mass)
 
     if ELEM_type == 4:
-        mass_mat = f_elem.mass_matrix(ElementType=ELEM_type, matrix_type='consistent', density=7850)
+        mass_mat = f_elem.mass_matrix(ElementType=ELEM_type, matrix_type='consistent', density=7850/1e9)
         m_glob = f_elem.get_global_mat(ElementType=ELEM_type, matrix_to_assemble=mass_mat)
     #condiciones de contorno del problema
     nodes = boundaries.get_boundaries()
     r, s = boundaries.get_r_s(nodes, dof_per_node=DOF_nodes)
     
     #calculo de autovalores
+    print('solving...')
     autoval, autov = eigh(K_glob[np.ix_(r,r)], m_glob[np.ix_(r,r)])
-    #freq = np.sqrt(autov) / (2*np.pi)
+    print('Done')
+    freq = np.sqrt(abs(autoval)) / (2*np.pi)
     disp = np.zeros(DOF_nodes*len(nodes))
-
+    # Imprime las frecuencias de los modos normales
+    num_freq = 0
+    print()
+    print('Frequency: ' + str(num_freq+1))
+    print(str(np.round(freq[num_freq], 1)) + ' Hz')
+    print()
+    #pdb.set_trace()
     for i in range(len(r)):
-        disp[r[i]] = autov[i, 4]
-    pdb.set_trace()
+        disp[r[i]] = autov[i, num_freq]
     
     file.clean()
     if ELEM_type == 4:
-        file.simple_write(disp,'Desplazam. MAX', dof_per_node=DOF_nodes)
+        file.clip_write(disp,'Desplazam. MAX', dof_per_node=DOF_nodes)
