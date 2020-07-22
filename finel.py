@@ -12,6 +12,7 @@ from consolemenu import *
 from consolemenu.items import *
 import pdb
 import matplotlib.pyplot as plt
+import time
 
 
 with open('gmsh_path', 'r') as file:
@@ -283,16 +284,19 @@ elif solve == 'Normal-Modes':
     
     #calculo de autovalores
     print('solving...')
+    start_time = time.time()
     autoval, autov = eigh(K_glob[np.ix_(r,r)], m_glob[np.ix_(r,r)])
+    print("Solved in %s seconds" % (time.time() - start_time))
     print('Done')
-    freq = np.sqrt(abs(autoval)) / (2*np.pi)
+    #ans= input('Frequency to graph: ')
+    freq = np.sqrt(autoval) / (2*np.pi)
     disp = np.zeros(DOF_nodes*len(nodes))
     # Imprime las frecuencias de los modos normales
-    num_freq = 0
+    num_freq = 2
     print()
-    print('Frequency: ' + str(num_freq+1))
-    print(str(np.round(freq[num_freq], 1)) + ' Hz')
-    print()
+    print('Frequency: {}'.format(freq[0:6]))
+    #print(str(np.round(freq[num_freq], 1)) + ' Hz')
+    #print()
     #pdb.set_trace()
     for i in range(len(r)):
         disp[r[i]] = autov[i, num_freq]
