@@ -288,11 +288,11 @@ elif solve == 'Normal-Modes':
     autoval, autov = eigh(K_glob[np.ix_(r,r)], m_glob[np.ix_(r,r)])
     print("Solved in %s seconds" % (time.time() - start_time))
     print('Done')
-    #ans= input('Frequency to graph: ')
+    ans= input('Frequency to graph: ')
     freq = np.sqrt(autoval) / (2*np.pi)
     disp = np.zeros(DOF_nodes*len(nodes))
     # Imprime las frecuencias de los modos normales
-    num_freq = 2
+    num_freq = int(ans) - 1
     print()
     print('Frequency: {}'.format(freq[0:6]))
     #print(str(np.round(freq[num_freq], 1)) + ' Hz')
