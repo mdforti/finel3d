@@ -292,15 +292,25 @@ elif solve == 'Normal-Modes':
     freq = np.sqrt(autoval) / (2*np.pi)
     disp = np.zeros(DOF_nodes*len(nodes))
     # Imprime las frecuencias de los modos normales
-    num_freq = int(ans) - 1
-    print()
-    print('Frequency: {}'.format(freq[0:6]))
+#MDF-COMMENT    supongo que acá elegis el modo que escribís
+#MDF-COMMENT    num_freq = 2
+    max_frec = min(4, autov.shape[1])
+    print(" se van a guardar los {:d} primeros modos".format(max_frec))
+#MDF-COMMENT    print('Frequency: {}'.format(freq[0:6]))
+    print('Frequency: {}'.format(freq[0:max_frec]))
     #print(str(np.round(freq[num_freq], 1)) + ' Hz')
     #print()
     #pdb.set_trace()
-    for i in range(len(r)):
-        disp[r[i]] = autov[i, num_freq]
-    
     file.clean()
-    if ELEM_type == 4:
-        file.clip_write(disp,'Desplazam. MAX', dof_per_node=DOF_nodes)
+    for num_freq in range(max_frec):
+        print('guardando modo {:d}'.format(num_freq))
+        for i in range(len(r)):
+            disp[r[i]] = autov[i, num_freq]
+        
+        if ELEM_type == 4:
+            file.clip_write(
+                    disp,
+                    'Desplazam. MAX {:d}'.format(num_freq),
+                    dof_per_node=DOF_nodes
+                    )
+
