@@ -157,12 +157,22 @@ if solve == 'Stress-Strain':
             exit()
         else:
             break
-
+    print('Reading boundaries file')
     boundaries = boundaries.read('nodes_selection_file.dat')
+    
+    f_elem = fe.finite_elements(nodes=nodes_mat, elements=elem, dof_per_node=DOF_nodes)
+
+    if ELEM_type == 5:
+        print('Getting beams areas')
+        a = f_elem.get_areas(ElementType=1, areas=1e-3)
+    else:
+        pass
+
+    #boundaries = boundaries.read('nodes_selection_file.dat')
     #lines = file.find_elements(ElementType=1)
 
     #Lineas con el physical group
-    physical_lines = file.find_physical_elements(ElementType=1)
+    physical_lines = file.find_physical_elements(ElementType=int(PHY_type))
     nodes = boundaries.get_boundaries()
     r, s = boundaries.get_r_s(nodes, dof_per_node=DOF_nodes)
 
@@ -195,11 +205,18 @@ if solve == 'Stress-Strain':
 
     file.clean()
     if ELEM_type == 2:
-        f_elem.get_stress()
-        tensiones = f_elem.get_principal_stress('max')
+        #f_elem.get_stress(ELEM_type)
+        tensiones = f_elem.get_principal_stress('max', ElementType=2)
         #Cuenta los elementos nuevamente para que las tensiones se escriban correctamente
         countElements = file.find_elements(ElementType=2)
         file.write(D,'Desplazamientos(m)',F,'Fuerzas(N)', tensiones, 'Tensiones(psi)', dof_per_node=2)
+
+    elif ELEM_type == 4:
+        #f_elem.get_stress()
+        tensiones = f_elem.get_principal_stress('max', ElementType=4)
+        #Cuenta los elementos nuevamente para que las tensiones se escriban correctamente
+        countElements = file.find_elements(ElementType=4)
+        file.write(D,'Desplazamientos(m)',F,'Fuerzas(N)', tensiones, 'Tensiones(psi)', dof_per_node=3)
 
     elif ELEM_type == 1:
 
@@ -245,7 +262,6 @@ elif solve == 'Normal-Modes':
     print('physical type, to set boundaries conditions')
     print('1: line      2: surf     4: volume')
     PHY_type = input('> ')
-    #pdb.set_trace()
     BST(file_name=file_name, num_of_nodes = len(nodes_mat), elem_type=int(PHY_type))
     while True:
         answer = input("Continue? (q to quit)")
@@ -288,11 +304,11 @@ elif solve == 'Normal-Modes':
     autoval, autov = eigh(K_glob[np.ix_(r,r)], m_glob[np.ix_(r,r)])
     print("Solved in %s seconds" % (time.time() - start_time))
     print('Done')
-    ans= input('Frequency to graph: ')
+    ans= input('Modes to graph: ')
     freq = np.sqrt(autoval) / (2*np.pi)
     disp = np.zeros(DOF_nodes*len(nodes))
     # Imprime las frecuencias de los modos normales
-#MDF-COMMENT    supongo que acá elegis el modo que escribís
+#MDF-COMMENT    supongo que aca elegis el modo que escribis
 #MDF-COMMENT    num_freq = 2
     max_frec = min(4, autov.shape[1])
     print(" se van a guardar los {:d} primeros modos".format(max_frec))

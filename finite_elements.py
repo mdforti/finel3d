@@ -19,8 +19,8 @@ class finite_elements:
                 i, j, m = self.elements[i, :] - 1 #le resto 1 a cada elemento para que coincida con los indices 
                 x, y = self.nodes[:,0], self.nodes[:,1]
                 A = np.array([[1, x[i], y[i]],
-                            [1, x[j], y[j]],
-                            [1, x[m], y[m]]])
+                              [1, x[j], y[j]],
+                              [1, x[m], y[m]]])
                 area = np.linalg.det(A) / 2
                 self.areas = np.append(self.areas, area)
 
@@ -164,6 +164,7 @@ class finite_elements:
             D[0, 1], D[0,2], D[1, 2] = nu, nu, nu
             D[1, 0], D[2,0], D[2, 1] = nu, nu, nu
             self.D = D * ( E/((1+nu)*(1-(2*nu))) )
+            self.B = []
             stiff_matrix = []
             volume = []
             x, y, z = self.nodes[:,0], self.nodes[:,1], self.nodes[:,2]
@@ -286,6 +287,7 @@ class finite_elements:
 
                 B = np.concatenate((B1, B2, B3, B4), axis=1)
                 B = B / volume_6
+                self.B.append(B)
                 # Obtengo la matriz de rigidez
                 Bt = np.transpose(B)
                 k = np.matmul(Bt, self.D)
@@ -370,27 +372,59 @@ class finite_elements:
         
         return self.Forces, self.Displacements
 
-    def get_stress(self):
-        self.stress = np.zeros([len(self.elements),3])
+    def get_stress(self, elem_t):
+        if elem_t == 2:
+            self.stress = np.zeros([len(self.elements),3])
 
-        for i in range(len(self.elements)):
-            disp_elem = np.zeros([6,1])
-            disp_elem[0::2] = self.Displacements[2*(self.elements[i]-1)]
-            disp_elem[1::2] = self.Displacements[2*(self.elements[i]-1)+1]
+            for i in range(len(self.elements)):
+                disp_elem = np.zeros([6,1])
+                disp_elem[0::2] = self.Displacements[2*(self.elements[i]-1)]
+                disp_elem[1::2] = self.Displacements[2*(self.elements[i]-1)+1]
 
-            b_dot_disp = np.matmul(self.B[i], disp_elem)
-            self.stress[i,:] = np.matmul(self.D, b_dot_disp ).T
+                b_dot_disp = np.matmul(self.B[i], disp_elem)
+                self.stress[i,:] = np.matmul(self.D, b_dot_disp ).T
+
+        elif elem_t == 4:
+            self.stress = np.zeros([len(self.elements),6])
+            for i in range(len(self.elements)):
+                
+                # Numero de nodos por elemento por grados de libertad
+                disp_elem = np.zeros([12,1])
+                disp_elem[0::3] = self.Displacements[3*(self.elements[i]-1)]
+                disp_elem[1::3] = self.Displacements[3*(self.elements[i]-1)+1]
+                disp_elem[2::3] = self.Displacements[3*(self.elements[i]-1)+2]
+
+                b_dot_disp = np.matmul(self.B[i], disp_elem)
+                self.stress[i,:] = np.matmul(self.D, b_dot_disp ).T
+
         return self.stress
     
-    def get_principal_stress(self, type):
-        sigma = self.get_stress()
-        value = []
-        if type=="max":
+    def get_principal_stress(self, type, ElementType):
+        if ElementType == 2:
+            sigma = self.get_stress(2)
+            value = []
+            if type=="max":
+                for i in range(len(sigma)):
+                    value.append(((sigma[i][0]+sigma[i][1])/2) + np.sqrt((((sigma[i][0]-sigma[i][1])/2)**2)+sigma[i][2]**2))
+            elif type=="min":
+                for i in range(len(sigma)):
+                    value.append(((sigma[i][0]+sigma[i][1])/2) - np.sqrt((((sigma[i][0]-sigma[i][1])/2)**2)+sigma[i][2]**2))
+        elif ElementType == 4:
+            sigma = self.get_stress(4)
+            value = []
             for i in range(len(sigma)):
-                value.append(((sigma[i][0]+sigma[i][1])/2) + np.sqrt((((sigma[i][0]-sigma[i][1])/2)**2)+sigma[i][2]**2))
-        elif type=="min":
-            for i in range(len(sigma)):
-                value.append(((sigma[i][0]+sigma[i][1])/2) - np.sqrt((((sigma[i][0]-sigma[i][1])/2)**2)+sigma[i][2]**2))
+                stress_tens = np.zeros([3, 3])
+                stress_tens[0, 0] = sigma[i][0]
+                stress_tens[1, 1] = sigma[i][1]
+                stress_tens[2, 2] = sigma[i][2]
+                stress_tens[1, 2] = sigma[i][3]
+                stress_tens[0, 2] = sigma[i][4]
+                stress_tens[0, 1] = sigma[i][5]
+                stress_tens[2, 1] = sigma[i][3]
+                stress_tens[2, 0] = sigma[i][4]
+                stress_tens[1, 0] = sigma[i][5]
+                stress, autov = np.linalg.eig(stress_tens)
+                value.append(np.amax(stress))
 
         return value
     
@@ -443,6 +477,4 @@ class finite_elements:
 
         np_matrix = np.array(matrix)
         return np_matrix
-
-
-    
+ 

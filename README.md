@@ -1,6 +1,6 @@
 # Elementos Finitos
 
-Este programa resuelve un mesh utilizando metodos de elementos finitos. La aplicacion es compatible con Linux y Windows. Necesita tener instalado Python 3.8.
+Este programa resuelve un mesh utilizando metodos de elementos finitos. La aplicacion es compatible con Linux, Windows y Mac OS. Necesita tener instalado Python 3.8.
 
 ## Instalación
 Clonar el repositorio con el comando:

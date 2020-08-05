@@ -1,6 +1,7 @@
 import numpy as np
 import sys
 import os
+import pdb
 
 class read:
     def __init__(self, filepath):
@@ -175,10 +176,10 @@ class read:
         return F
     
     def get_stress(self, nodes, lines, forces, nodetype, ElementType, dof_per_node):
-        thickness = 1
-        F = np.zeros(2*len(nodes)).reshape(-1,1)
+        F = np.zeros(dof_per_node*len(nodes)).reshape(-1,1)
 
         if ElementType == 2:
+            thickness = 1
             for i in range(len(lines)):
                 # Fuerza aplicada en la linea 1 (la de arriba)
                 nod1 = nodes[lines[i][2]-1]
@@ -196,6 +197,86 @@ class read:
                     F[2*(lines[i][2]-1)] -= longit*thickness*forces[lines[i][0]]/2
                 if nodetype[lines[i][3]-1] == 4:
                     F[2*(lines[i][3]-1)] -= longit*thickness*forces[lines[i][0]]/2
+                # 5 - FUERZAS Y POSITIVAS
+                if nodetype[lines[i][2]-1] == 5:
+                    F[(2*(lines[i][2]-1))+1] += longit*thickness*forces[lines[i][0]]/2
+                if nodetype[lines[i][3]-1] == 5:
+                    F[(2*(lines[i][3]-1))+1] += longit*thickness*forces[lines[i][0]]/2
+                # 6 - FUERZAS Y NEGATIVAS
+                if nodetype[lines[i][2]-1] == 6:
+                    F[(2*(lines[i][2]-1))+1] -= longit*thickness*forces[lines[i][0]]/2
+                if nodetype[lines[i][3]-1] == 6:
+                    F[(2*(lines[i][3]-1))+1] -= longit*thickness*forces[lines[i][0]]/2
+
+                # FUERZAS Y VINCULOS
+                # 7 - FUERZAS X POSITIVAS + VINCULO 3ra especie
+                if nodetype[lines[i][2]-1] == 7:
+                    F[2*(lines[i][2]-1)] += longit*thickness*forces[lines[i][0]]/2
+                if nodetype[lines[i][3]-1] == 7:
+                    F[2*(lines[i][3]-1)] += longit*thickness*forces[lines[i][0]]/2
+                # 8 - FUERZAS X NEGATIVAS + VINCULO 3ra especie
+                if nodetype[lines[i][2]-1] == 8:
+                    F[2*(lines[i][2]-1)] -= longit*thickness*forces[lines[i][0]]/2
+                if nodetype[lines[i][3]-1] == 8:
+                    F[2*(lines[i][3]-1)] -= longit*thickness*forces[lines[i][0]]/2
+                # 9 - FUERZAS Y POSITIVAS + VINCULO 3ra especie
+                if nodetype[lines[i][2]-1] == 9:
+                    F[(2*(lines[i][2]-1))+1] += longit*thickness*forces[lines[i][0]]/2
+                if nodetype[lines[i][3]-1] == 9:
+                    F[(2*(lines[i][3]-1))+1] += longit*thickness*forces[lines[i][0]]/2
+                # 10 - FUERZAS Y NEGATIVAS + VINCULO 3ra especie
+                if nodetype[lines[i][2]-1] == 10:
+                    F[(2*(lines[i][2]-1))+1] -= longit*thickness*forces[lines[i][0]]/2
+                if nodetype[lines[i][3]-1] == 10:
+                    F[(2*(lines[i][3]-1))+1] -= longit*thickness*forces[lines[i][0]]/2
+                
+                # FUERZAS Y RESTRICCIONES
+                # 13 - FUERZA X POSITIVA + RESTRICCION Y
+                if nodetype[lines[i][2]-1] == 13:
+                    F[2*(lines[i][2]-1)] += longit*thickness*forces[lines[i][0]]/2
+                if nodetype[lines[i][3]-1] == 13:
+                    F[2*(lines[i][3]-1)] += longit*thickness*forces[lines[i][0]]/2
+                # 14 - FUERZA X NEGATIVA + RESTRICCION Y
+                if nodetype[lines[i][2]-1] == 14:
+                    F[2*(lines[i][2]-1)] -= longit*thickness*forces[lines[i][0]]/2
+                if nodetype[lines[i][3]-1] == 14:
+                    F[2*(lines[i][3]-1)] -= longit*thickness*forces[lines[i][0]]/2
+                # 9 - FUERZAS Y POSITIVAS + RESTRICCION X
+                if nodetype[lines[i][2]-1] == 15:
+                    F[(2*(lines[i][2]-1))+1] += longit*thickness*forces[lines[i][0]]/2
+                if nodetype[lines[i][3]-1] == 15:
+                    F[(2*(lines[i][3]-1))+1] += longit*thickness*forces[lines[i][0]]/2
+                # 10 - FUERZAS Y NEGATIVAS + RESTRICCION X
+                if nodetype[lines[i][2]-1] == 16:
+                    F[(2*(lines[i][2]-1))+1] -= longit*thickness*forces[lines[i][0]]/2
+                if nodetype[lines[i][3]-1] == 16:
+                    F[(2*(lines[i][3]-1))+1] -= longit*thickness*forces[lines[i][0]]/2
+        if ElementType == 4:
+
+            for i in range(len(lines)):
+                # Fuerza aplicada en la linea 1 (la de arriba)
+                a = nodes[lines[i][2]-1]
+                b = nodes[lines[i][3]-1]
+                c = nodes[lines[i][4]-1]
+                cross_prod = np.cross( b-a, c-a )
+                area = 0.5 * np.linalg.norm(cross_prod)
+                # FUERZAS SOLAS
+                # 3 - FUERZAS X POSITIVAS
+                if nodetype[lines[i][2]-1] == 3:
+                    F[3*(lines[i][2]-1)] += area*forces[lines[i][0]]/3
+                if nodetype[lines[i][3]-1] == 3:
+                    F[3*(lines[i][3]-1)] += area*forces[lines[i][0]]/3
+                if nodetype[lines[i][3]-1] == 3:
+                    F[3*(lines[i][4]-1)] += area*forces[lines[i][0]]/3
+                
+                # 4 - FUERZAS X NEGATIVAS
+                if nodetype[lines[i][2]-1] == 4:
+                    F[3*(lines[i][2]-1)] -= area*forces[lines[i][0]]/3
+                if nodetype[lines[i][3]-1] == 4:
+                    F[3*(lines[i][3]-1)] -= area*forces[lines[i][0]]/3
+                if nodetype[lines[i][3]-1] == 4:
+                    F[3*(lines[i][4]-1)] -= area*forces[lines[i][0]]/3
+
                 # 5 - FUERZAS Y POSITIVAS
                 if nodetype[lines[i][2]-1] == 5:
                     F[(2*(lines[i][2]-1))+1] += longit*thickness*forces[lines[i][0]]/2

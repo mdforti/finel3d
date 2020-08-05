@@ -2,3 +2,5 @@
 numpy
 alive_progress
 console-menu
+matplotlib
+scipy

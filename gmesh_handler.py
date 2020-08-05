@@ -2,6 +2,7 @@ import sys
 import os
 import numpy as np
 import time
+import pdb
 
 class read:
 
@@ -99,7 +100,7 @@ class read:
         return self.element_mat
     
     def write(self, D, D_name, F, F_name, sigma, sigma_name, dof_per_node):
-        nodes = int(len(D)/2)
+        nodes = int(len(D)/dof_per_node)
         elements = int(len(sigma))
         flag = 0
         with open('./mesh/'+self.path, 'r') as file:
@@ -234,6 +235,73 @@ class read:
                         file.write('\n')
                     file.write('$EndNodeData')
                 # Escribe la propiedad de cada elemento
+                if dof_per_node == 3:
+                    file.write('\n')
+                    file.write('$NodeData\n')
+                    file.write('1\n')
+                    file.write('"'+D_name+'"')
+                    file.write('\n')
+                    file.write('1\n')
+                    file.write('0\n')
+                    file.write('3\n')
+                    file.write('0\n')
+                    file.write('3\n')
+                    file.write('{}\n'.format(nodes))
+                    index = 0
+                    for i in range(len(D)):
+                        if i % 3 ==0:
+                            index+=1
+                            file.write(str(index))
+                            file.write(' ')
+                            file.write(str(D[i].item()))
+                            file.write(' ')
+                            file.write(str(D[i+1].item()))
+                            file.write(' ')
+                            file.write(str(D[i+2].item())+'\n')
+                    file.write('$EndNodeData')
+                #Escribe las fuerzas en cada nodo
+                    file.write('\n')
+                    file.write('$NodeData\n')
+                    file.write('1\n')
+                    file.write('"'+F_name+'"')
+                    file.write('\n')
+                    file.write('1\n')
+                    file.write('0\n')
+                    file.write('3\n')
+                    file.write('0\n')
+                    file.write('3\n')
+                    file.write('{}\n'.format(nodes))
+                    index = 0
+                    for i in range(len(F)):
+                        if i % 3 ==0:
+                            index+=1
+                            file.write(str(index))
+                            file.write(' ')
+                            file.write(str(F[i].item()))
+                            file.write(' ')
+                            file.write(str(F[i+1].item()))
+                            file.write(' ')
+                            file.write(str(F[i+2].item())+'\n')
+                    file.write('$EndNodeData')
+                # Escribe la propiedad de cada elemento
+                    file.write('\n')
+                    file.write('$ElementData\n')
+                    file.write('1\n')
+                    file.write('"'+sigma_name+'"')
+                    file.write('\n')
+                    file.write('1\n')
+                    file.write('0\n')
+                    file.write('3\n')
+                    file.write('0\n')
+                    file.write('1\n')
+                    file.write('{}\n'.format(elements))
+                    index = 0
+                    for i in range(len(sigma)):
+                        file.write(str(i+1+self.element_start))
+                        file.write(' ')
+                        file.write(str(sigma[i].item()))
+                        file.write('\n')
+                    file.write('$EndElementData')
                 '''
                     file.write('\n')
                     file.write('$ElementData\n')
@@ -361,7 +429,7 @@ class read:
                         file.write('\n')
                 file.write('$EndNodeData')
 
-            if dof_per_node == 3:
+            elif dof_per_node == 3:
                 file.write('\n')
                 file.write('$NodeData\n')
                 file.write('1\n')
