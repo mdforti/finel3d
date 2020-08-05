@@ -304,22 +304,22 @@ elif solve == 'Normal-Modes':
     autoval, autov = eigh(K_glob[np.ix_(r,r)], m_glob[np.ix_(r,r)])
     print("Solved in %s seconds" % (time.time() - start_time))
     print('Done')
-    ans= input('Modes to graph: ')
+    #ans= input('Modes to graph: ')
     freq = np.sqrt(autoval) / (2*np.pi)
     disp = np.zeros(DOF_nodes*len(nodes))
     # Imprime las frecuencias de los modos normales
-#MDF-COMMENT    supongo que aca elegis el modo que escribis
-#MDF-COMMENT    num_freq = 2
+    #MDF-COMMENT    supongo que aca elegis el modo que escribis
+    #MDF-COMMENT    num_freq = 2
     max_frec = min(4, autov.shape[1])
-    print(" se van a guardar los {:d} primeros modos".format(max_frec))
-#MDF-COMMENT    print('Frequency: {}'.format(freq[0:6]))
+    print("Saving {:d} first modes...".format(max_frec))
+    #MDF-COMMENT    print('Frequency: {}'.format(freq[0:6]))
     print('Frequency: {}'.format(freq[0:max_frec]))
     #print(str(np.round(freq[num_freq], 1)) + ' Hz')
     #print()
     #pdb.set_trace()
     file.clean()
     for num_freq in range(max_frec):
-        print('guardando modo {:d}'.format(num_freq))
+        print('saving mode {:d}'.format(num_freq))
         for i in range(len(r)):
             disp[r[i]] = autov[i, num_freq]
         
@@ -329,4 +329,16 @@ elif solve == 'Normal-Modes':
                     'Desplazam. MAX {:d}'.format(num_freq),
                     dof_per_node=DOF_nodes
                     )
+    while True:
+        answer = input("Open gmsh? (y/n): ")
+        if answer == 'y':
+            if 'Linux' in platform.system():
+                os.system('/usr/local/bin/gmsh -open ./mesh/'+ sys.argv[2])
+            elif 'Darwin' in platform.system():
+                os.system('/Applications/Gmsh.app/Contents/MacOS/gmsh -open ./mesh/'+sys.argv[2])
+            else:
+                subprocess.Popen(gmsh_path + "/gmsh.exe -open ./mesh/"+sys.argv[2])
+            break
+        if answer =='n':
+            exit()
 

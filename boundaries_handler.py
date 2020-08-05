@@ -266,7 +266,7 @@ class read:
                     F[3*(lines[i][2]-1)] += area*forces[lines[i][0]]/3
                 if nodetype[lines[i][3]-1] == 3:
                     F[3*(lines[i][3]-1)] += area*forces[lines[i][0]]/3
-                if nodetype[lines[i][3]-1] == 3:
+                if nodetype[lines[i][4]-1] == 3:
                     F[3*(lines[i][4]-1)] += area*forces[lines[i][0]]/3
                 
                 # 4 - FUERZAS X NEGATIVAS
@@ -274,9 +274,9 @@ class read:
                     F[3*(lines[i][2]-1)] -= area*forces[lines[i][0]]/3
                 if nodetype[lines[i][3]-1] == 4:
                     F[3*(lines[i][3]-1)] -= area*forces[lines[i][0]]/3
-                if nodetype[lines[i][3]-1] == 4:
+                if nodetype[lines[i][4]-1] == 4:
                     F[3*(lines[i][4]-1)] -= area*forces[lines[i][0]]/3
-
+                # TERMINAR DE HACER LO MISMO QUE HICE ARRIBA CON TODOS LOS IF DE ABAJO
                 # 5 - FUERZAS Y POSITIVAS
                 if nodetype[lines[i][2]-1] == 5:
                     F[(2*(lines[i][2]-1))+1] += longit*thickness*forces[lines[i][0]]/2
